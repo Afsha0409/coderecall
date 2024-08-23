@@ -1,0 +1,79 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Task {
+  category    EnumTaskCategory?
+  completions Completion[]
+  createdAt   DateTime          @default(now())
+  description String?
+  id          String            @id @default(cuid())
+  points      Int?
+  title       String?
+  updatedAt   DateTime          @updatedAt
+}
+
+model Certificate {
+  createdAt DateTime  @default(now())
+  id        String    @id @default(cuid())
+  issueDate DateTime?
+  student   Student?  @relation(fields: [studentId], references: [id])
+  studentId String?
+  title     String?
+  updatedAt DateTime  @updatedAt
+}
+
+model Student {
+  certificates   Certificate[]
+  completions    Completion[]
+  createdAt      DateTime      @default(now())
+  email          String?
+  id             String        @id @default(cuid())
+  name           String?
+  profilePicture Json?
+  updatedAt      DateTime      @updatedAt
+}
+
+model Completion {
+  badges         Badge[]
+  completionDate DateTime?
+  createdAt      DateTime  @default(now())
+  id             String    @id @default(cuid())
+  student        Student?  @relation(fields: [studentId], references: [id])
+  studentId      String?
+  task           Task?     @relation(fields: [taskId], references: [id])
+  taskId         String?
+  updatedAt      DateTime  @updatedAt
+}
+
+model Badge {
+  completion   Completion? @relation(fields: [completionId], references: [id])
+  completionId String?
+  createdAt    DateTime    @default(now())
+  description  String?
+  id           String      @id @default(cuid())
+  image        Json?
+  title        String?
+  updatedAt    DateTime    @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+enum EnumTaskCategory {
+  Option1
+}
